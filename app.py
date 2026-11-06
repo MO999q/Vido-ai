@@ -2,7 +2,6 @@ import streamlit as st
 import os
 import requests
 from gtts import gTTS
-from moviepy.editor import ImageClip, AudioFileClip, concatenate_videoclips
 from PIL import Image
 
 # إعدادات الصفحة والتصميم العام
@@ -43,39 +42,40 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🎬 Vido AI Pro - Ultimate Video Studio")
-st.caption("الاستوديو الذكي لدمج وصناعة فيديو كامل ومتصل (MP4) بجودة احترافية")
+st.title("🎬 Vido AI Pro - Kids Studio")
+st.caption("الاستوديو الذكي المتكامل لتوليد وصناعة فيديوهات وعروض كرتونية احترافية للأطفال")
 
 # إنشاء مجلد مؤقت للأصول والملفات
 os.makedirs("temp_assets", exist_ok=True)
 
 # سكريبت افتراضي مخصص لفيديوهات الأطفال الكرتونية الجذابة
 default_script = """A cute baby smiling with colorful balloons in a magical bright playroom, 3D Disney Pixar style, vibrant colors.
-A cheerful baby elephant wearing a tiny party hat playing with bright stars, 3D animated style, high quality."""
+A cheerful baby elephant wearing a tiny party hat playing with bright stars, 3D animated style, high quality.
+A little cute kitten playing with a ball of yarn in a sunny garden, 3D animated style, bright and colorful."""
 
 script_input = st.text_area(
-    "📜 أدخل وصف المشاهد بالإنجليزية (كل مشهد في سطر مستقل لضمان دمجها في فيديو واحد):",
+    "📜 أدخل وصف المشاهد بالإنجليزية (كل مشهد في سطر مستقل):",
     value=default_script,
     height=160
 )
 
-# زر البدء والمعالجة وتصدير الفيديو الكامل
-if st.button("🚀 بدء دمج وتصدير الفيديو الكامل (MP4)"):
+# زر البدء والمعالجة
+if st.button("🚀 بدء توليد وعرض الفيديو السينمائي المتكامل"):
     if not script_input.strip():
         st.warning("⚠️ يرجى إدخال السكريبت أولاً!")
     else:
         scenes = [s.strip() for s in script_input.split('\n') if s.strip()]
         total_scenes = len(scenes)
-        video_clips = []
         
         progress_bar = st.progress(0)
         percentage_text = st.empty()
         status_box = st.empty()
         
         try:
+            scene_data = []
+            
             for index, scene_text in enumerate(scenes):
-                # حساب النسبة المئوية التقريبية أثناء المعالجة (حتى 80% للمشاهد)
-                current_percent = int(((index) / total_scenes) * 80)
+                current_percent = int(((index + 1) / total_scenes) * 100)
                 progress_bar.progress(current_percent)
                 percentage_text.markdown(f"### ⏳ نسبة الإنجاز: `{current_percent}%`")
                 
@@ -94,10 +94,7 @@ if st.button("🚀 بدء دمج وتصدير الفيديو الكامل (MP4)"
                 except Exception:
                     pass
                 
-                audio_clip = AudioFileClip(audio_path)
-                duration = audio_clip.duration
-                
-                # 2. توليد الصورة الكرتونية بدقة عالية بدون علامات مائية (nologo=true)
+                # 2. توليد الصورة الكرتونية بجودة عالية جداً بدون علامات مائية (nologo=true)
                 image_path = f"temp_assets/scene_{index}.jpg"
                 image_fetched = False
                 
@@ -119,32 +116,22 @@ if st.button("🚀 بدء دمج وتصدير الفيديو الكامل (MP4)"
                     img = Image.new('RGB', (1024, 576), color=(30, 41, 59))
                     img.save(image_path)
                 
-                # 3. ربط الصورة بالصوت لمدة المشهد وإضافتها لقائمة المقاطع
-                image_clip = ImageClip(image_path).set_duration(duration)
-                video_clip = image_clip.set_audio(audio_clip)
-                video_clips.append(video_clip)
+                scene_data.append({"image": image_path, "audio": audio_path, "desc": scene_text})
 
-            # مرحلة دمج كافة المقاطع في ملف فيديو نهائي واحد ومتصل
-            progress_bar.progress(85)
-            percentage_text.markdown("### ⏳ نسبة الإنجاز: `85%`")
-            status_box.markdown("""
-            <div class="status-card">
-                <b>🔄 جاري دمج كافة المشاهد في فيديو كامل ومتصل وتصدير ملف (MP4)...</b>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            final_video = concatenate_videoclips(video_clips, method="compose")
-            output_file = "final_output_video.mp4"
-            final_video.write_videofile(output_file, fps=24, codec="libx264", audio_codec="aac")
-            
-            # اكتمال العملية بنجاح 100%
-            progress_bar.progress(100)
-            percentage_text.markdown("### ✅ نسبة الإنجاز: `100%`")
             status_box.empty()
+            st.success("🎉 تم توليد وإعداد كافة مشاهد الاستوديو الكرتوني بنجاح تام وبدون علامات مائية!")
             
-            st.success("🎉 تم إنشاء وتصدير الفيديو الكامل والمتصل بنجاح تام وبدون علامات مائية!")
-            st.video(output_file)
+            # عرض المشاهد بشكل متسلسل واحترافي يشبه الفيديو الكامل
+            st.markdown("---")
+            st.subheader("▶️ معاضة العرض السينمائي المتكامل للمشاهد:")
+            
+            for i, data in enumerate(scene_data):
+                st.markdown(f"### المشهد {i + 1}")
+                st.image(data["image"], caption=data["desc"], use_container_width=True)
+                if os.path.exists(data["audio"]):
+                    st.audio(data["audio"])
+                st.markdown("---")
             
         except Exception as e:
             status_box.empty()
-            st.error(f"❌ حدث خطأ أثناء دمج وتصدير الفيديو: {e}")
+            st.error(f"❌ حدث خطأ غير متوقع أثناء المعالجة: {e}")
