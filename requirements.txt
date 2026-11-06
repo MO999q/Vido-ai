@@ -2,3 +2,5 @@ streamlit
 requests
 gtts
 Pillow
+imageio
+imageio-ffmpeg
