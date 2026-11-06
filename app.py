@@ -1,18 +1,22 @@
 import streamlit as st
 import os
 import requests
-from gTTS import gTTS
+from gtts import gTTS
 from PIL import Image
 
+# إعدادات الصفحة والتصميم العام
 st.set_page_config(
-    page_title="Vido AI Studio - Fast & Stable",
+    page_title="Vido AI Pro - Ultimate Studio",
     page_icon="🎬",
     layout="centered"
 )
 
+# تصميم واجهة مستخدم احترافية وعصرية (Dark Mode)
 st.markdown("""
     <style>
-    .main { background-color: #0b0f19; }
+    .main {
+        background-color: #0b0f19;
+    }
     .stButton>button {
         width: 100%;
         background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
@@ -22,6 +26,10 @@ st.markdown("""
         border-radius: 10px;
         border: none;
         font-size: 16px;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+    .stButton>button:hover {
+        background: linear-gradient(135deg, #1d4ed8 100%, #1e40af 100%);
     }
     .status-card {
         padding: 16px;
@@ -34,48 +42,60 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🎬 Vido AI Studio - Stable Edition")
-st.caption("الاستوديو الذكي السريع لتوليد الصور والتعليق الصوتي للمشاهد بدون أخطاء تثبيت")
+st.title("🎬 Vido AI Pro - Ultimate Studio")
+st.caption("الاستوديو الذكي المتكامل لتوليد وصناعة محتوى مرئي وصوتي احترافي وطويل")
 
+# إنشاء مجلد مؤقت للأصول والملفات
 os.makedirs("temp_assets", exist_ok=True)
 
-default_script = """المشهد الأول: رحلة استكشاف مذهلة داخل غابة ساحرة مليئة بالأضواء.
-المشهد الثاني: البطل يكتشف أثراً قديماً غامضاً ينبض بطاقة سرية.
-المشهد الثالث: تنطلق اللقطة نحو السماء الواسعة وسط نجوم الفضاء الساطعة."""
+# إدخال السكريبت (يدعم المشاهد المتعددة لفيديوهات مدتها دقيقة أو أكثر)
+default_script = """المشهد الأول: رحلة استكشاف مذهلة داخل غابة ساحرة مليئة بالأشجار العملاقة والأضواء المتوهجة.
+المشهد الثاني: البطل يكتشف أثراً قديماً غامضاً ينبض بطاقة سرية لا تصدق.
+المشهد الثالث: تبدأ الأثر في الانفتاح كاشفة عن بوابة لعالم مستقبلية مذهلة.
+المشهد الرابع: تنطلق اللقطة نحو السماء الواسعة وسط نجوم الفضاء الساطعة لتختتم المشهد بملحمية."""
 
 script_input = st.text_area(
-    "📜 أدخل السكريبت (كل مشهد في سطر مستقل):",
+    "📜 أدخل السكريبت الخاص بك (اكتب كل مشهد في سطر مستقل لضمان الدقة وتوليد محتوى طويل):",
     value=default_script,
-    height=150
+    height=180
 )
 
-if st.button("🚀 بدء توليد المشاهد والصوتيات فوراً"):
+# زر البدء والمعالجة
+if st.button("🚀 بدء إنشاء وتوليد مشاهد الاستوديو الاحترافية"):
     if not script_input.strip():
         st.warning("⚠️ يرجى إدخال السكريبت أولاً!")
     else:
         scenes = [s.strip() for s in script_input.split('\n') if s.strip()]
         total_scenes = len(scenes)
         
+        # عناصر تتبع التقدم والنسبة المئوية المباشرة
         progress_bar = st.progress(0)
+        percentage_text = st.empty()
         status_box = st.empty()
         
         try:
             for index, scene_text in enumerate(scenes):
-                progress_bar.progress(int(((index + 1) / total_scenes) * 100))
+                # حساب النسبة المئوية التقريبية بدقة
+                current_percent = int(((index + 1) / total_scenes) * 100)
+                progress_bar.progress(current_percent)
+                percentage_text.markdown(f"### ⏳ نسبة الإنجاز: `{current_percent}%`")
+                
+                clean_scene_desc = scene_text.split(":")[-1].strip() if ":" in scene_text else scene_text
+                
                 status_box.markdown(f"""
                 <div class="status-card">
                     <b>🎬 معالجة المشهد ({index + 1} من {total_scenes}):</b><br>
-                    <i>"{scene_text}"</i>
+                    <i>"{clean_scene_desc}"</i>
                 </div>
                 """, unsafe_allow_html=True)
                 
-                # 1. توليد الصوت
+                # 1. توليد التعليق الصوتي للمشهد بدقة عالية باستخدام gTTS
                 audio_path = f"temp_assets/scene_{index}.mp3"
-                tts = gTTS(text=scene_text, lang='ar', slow=False)
+                tts = gTTS(text=clean_scene_desc, lang='ar', slow=False)
                 tts.save(audio_path)
                 
-                # 2. توليد الصورة السينمائية
-                prompt_encoded = requests.utils.quote(f"Cinematic 8k resolution, {scene_text}")
+                # 2. توليد الصورة السينمائية المناسبة عبر Pollinations.ai مع معالجة Pillow
+                prompt_encoded = requests.utils.quote(f"Cinematic 8k resolution, highly detailed, dramatic lighting, {clean_scene_desc}")
                 image_url = f"https://image.pollinations.ai/prompt/{prompt_encoded}?width=1024&height=576&nologo=true"
                 image_path = f"temp_assets/scene_{index}.jpg"
                 
@@ -84,17 +104,20 @@ if st.button("🚀 بدء توليد المشاهد والصوتيات فورا�
                     with open(image_path, 'wb') as handler:
                         handler.write(img_response.content)
                     
+                    # استخدام Pillow لضبط الأبعاد والجودة بدقة احترافية
                     img = Image.open(image_path)
                     img = img.resize((1024, 576))
                     img.save(image_path)
+                else:
+                    raise Exception("فشل في جلب صورة المشهد من مولد الذكاء الاصطناعي.")
                 
-                # عرض النتيجة لكل مشهد مباشرة (صورة + صوت) لضمان الاستقرار التام وسرعة العرض
-                st.image(image_path, caption=f"المشهد {index + 1}")
+                # عرض النتيجة المتكاملة لكل مشهد (صورة سينمائية + تعليق صوتي متزامن)
+                st.image(image_path, caption=f"المشهد {index + 1}: {clean_scene_desc}", use_container_width=True)
                 st.audio(audio_path)
             
             status_box.empty()
-            st.success("🎉 تم توليد كافة مشاهد الاستوديو بنجاح وبدون أي أخطاء تثبيت!")
+            st.success("🎉 تم إنشاء وتوليد كافة مشاهد الاستوديو بنجاح تام وبجودة تنافسية مذهلة!")
             
         except Exception as e:
             status_box.empty()
-            st.error(f"❌ حدث خطأ: {e}")
+            st.error(f"❌ حدث خطأ غير متوقع أثناء المعالجة: {e}")
