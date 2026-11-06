@@ -1,90 +1,131 @@
 import streamlit as st
-import time
+import os
+import requests
+from gTTS import gTTS
+from moviepy.editor import ImageClip, AudioFileClip, concatenate_videoclips
 
+# إعدادات الصفحة والتصميم
 st.set_page_config(
-    page_title="Vido AI Pro - Dynamic Studio",
+    page_title="Vido AI Pro - Full Video Generator",
     page_icon="🎬",
     layout="centered"
 )
 
+# لمسات تصميمية بالـ CSS لتحسين مظهر الواجهة
 st.markdown("""
     <style>
-    .main { background-color: #030712; color: #f9fafb; }
+    .main {
+        background-color: #0f172a;
+    }
     .stButton>button {
         width: 100%;
-        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        background-color: #2563eb;
         color: white;
-        border-radius: 14px;
-        height: 4em;
         font-weight: bold;
-        font-size: 18px;
+        padding: 12px;
+        border-radius: 8px;
         border: none;
-        box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
-    }
-    .stTextArea textarea { 
-        background-color: #0b0f19; 
-        color: #38bdf8; 
-        border-radius: 12px; 
-        border: 1px solid #4f46e5;
         font-size: 16px;
-        line-height: 1.6;
     }
-    .output-card {
-        background-color: #0b0f19;
-        padding: 24px;
-        border-radius: 16px;
-        border: 1px solid #7c3aed;
-        margin-top: 20px;
+    .stButton>button:hover {
+        background-color: #1d4ed8;
+    }
+    .status-card {
+        padding: 15px;
+        background-color: #1e293b;
+        border-radius: 8px;
+        border-right: 5px solid #2563eb;
+        margin-bottom: 15px;
     }
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<h1 style='text-align: center; color: #ffffff;'>🎬 Vido AI Pro - Studio</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #9ca3af;'>محرك الإنتاج الذكي والمخصص كلياً لأوامرك الحرة بلا قيود أو أمثلة مسبقة</p>", unsafe_allow_html=True)
-st.divider()
+st.title("🎬 Vido AI Pro - Ultimate Studio")
+st.caption("أنشئ فيديوهات كاملة (MP4) بدمج الصوت، الصور والتأثيرات تلقائياً")
 
-# خانة إدخال فارغة تماماً لتكتب فيها ما تشاء
-st.subheader("🎯 اكتب فكرتك أو سيناريوك الحر:")
-user_input_prompt = st.text_area(
-    "اكتب هنا أي فكرة، سيناريو، أو أمر تفصيلي تريده دون أي قيود:",
-    placeholder="اكتب ما تحتاجه هنا، وسيتعامل النظام معه فوراً...",
-    height=220
+# إنشاء مجلد مؤقت لحفظ الأصول
+os.makedirs("temp_assets", exist_ok=True)
+
+# إدخال السكريبت
+default_script = """المشهد الأول: رائد فضاء يستكشف كوكباً غريباً مليئاً بالأضواء.
+المشهد الثاني: يجد سفينة فضائية قديمة مهجورة بين الجبال.
+المشهد الثالث: تضيء السفينة فجأة وتنطلق إلى السماء بسرعة عالية."""
+
+script_input = st.text_area(
+    "📜 أدخل السكريبت (اكتب كل مشهد في سطر منفصل):",
+    value=default_script,
+    height=160
 )
 
-col1, col2 = st.columns(2)
-with col1:
-    content_mode = st.selectbox("اختر نمط الإنتاج:", ["فيديو ثلاثي الأبعاد (3D Animation)", "مشهد سينمائي واقعي (Cinematic)", "موشن جرافيك (2D Motion)", "محتوى إعلاني أو ترويجي"])
-with col2:
-    execution_speed = st.selectbox("دقة الإخراج:", ["دقيق وثاني بثانية", "سريع ومكثف", "تفاعلي قياسي"])
-
-if st.button("🚀 تنفيذ وتحليل الأمر فورا"):
-    if not user_input_prompt.strip():
-        st.warning("⚠️ الرجاء كتابة السيناريو أو الفكرة في المربع أولاً!")
+if st.button("🚀 بدء إنشاء وتصدير الفيديو الكامل (MP4)"):
+    if not script_input.strip():
+        st.warning("⚠️ يرجى إدخال السكريبت أولاً!")
     else:
+        scenes = [s.strip() for s in script_input.split('\n') if s.strip()]
+        total_scenes = len(scenes)
+        video_clips = []
+        
+        # عناصر متابعة الإنجاز والنسبة المئوية
         progress_bar = st.progress(0)
+        percentage_text = st.empty()
         status_box = st.empty()
         
-        status_box.text("جاري قراءة وتحليل النص المدخل بدقة...")
-        progress_bar.progress(30)
-        time.sleep(1)
-        
-        status_box.text(f"جاري هندسة المخطط الزمني وتطبيق نمط ({content_mode})...")
-        progress_bar.progress(70)
-        time.sleep(1)
-        
-        status_box.text("جاري التجميع النهائي والمطابقة التامة لأمرك...")
-        progress_bar.progress(100)
-        time.sleep(0.5)
-        
-        st.success("✨ تم تحليل وتنفيذ أمرك بنجاح مطابقةً تماماً لما كتبته!")
-        
-        st.markdown("<div class='output-card'>", unsafe_allow_html=True)
-        st.markdown("### 📋 التقرير الميداني لتنفيذ أمرك:")
-        st.write(f"**📝 النص المُدخل:** `{user_input_prompt}`")
-        st.write(f"**🎨 النمط المختار:** {content_mode} | الدقة: {execution_speed}")
-        st.markdown("<hr style='border-color: #1f2937;'>", unsafe_allow_html=True)
-        st.markdown("✅ **تم الالتزام حصرياً بالنص الذي كتبته أنت وتطبيق كافة الشروط عليه بلا أي إضافات خارجية.**")
-        st.markdown("</div>", unsafe_allow_html=True)
+        try:
+            for index, scene_text in enumerate(scenes):
+                # حساب النسبة المئوية التقريبية لكل مشهد
+                current_percent = int(((index) / total_scenes) * 85) # 85% لمعالجة المشاهد و 15% للدمج النهائي
+                progress_bar.progress(current_percent)
+                percentage_text.markdown(f"### ⏳ نسبة الإنجاز: `{current_percent}%`")
+                status_box.markdown(f"""
+                <div class="status-card">
+                    <b>🎬 معالجة المشهد ({index + 1} من {total_scenes}):</b><br>
+                    <i>"{scene_text}"</i>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # 1. توليد الصوت
+                audio_path = f"temp_assets/scene_{index}.mp3"
+                tts = gTTS(text=scene_text, lang='ar', slow=False)
+                tts.save(audio_path)
+                
+                audio_clip = AudioFileClip(audio_path)
+                duration = audio_clip.duration
+                
+                # 2. توليد الصورة
+                prompt_encoded = requests.utils.quote(f"Cinematic 3D render, {scene_text}")
+                image_url = f"https://image.pollinations.ai/prompt/{prompt_encoded}?width=768&height=768&nologo=true"
+                image_path = f"temp_assets/scene_{index}.jpg"
+                
+                img_data = requests.get(image_url).content
+                with open(image_path, 'wb') as handler:
+                    handler.write(img_data)
+                
+                # 3. ربط الصورة بالصوت
+                image_clip = ImageClip(image_path).set_duration(duration)
+                video_clip = image_clip.set_audio(audio_clip)
+                video_clips.append(video_clip)
 
-st.divider()
-st.caption("Vido AI Pro - مصمم خصيصاً لتنفيذ رؤيتك بحرية تامة.")
+            # مرحلة الدمج النهائي
+            progress_bar.progress(90)
+            percentage_text.markdown("### ⏳ نسبة الإنجاز: `90%`")
+            status_box.markdown("""
+            <div class="status-card">
+                <b>🔄 جاري دمج كافة المشاهد وتصدير ملف الفيديو النهائي...</b>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            final_video = concatenate_videoclips(video_clips, method="compose")
+            output_file = "final_video.mp4"
+            final_video.write_videofile(output_file, fps=24, codec="libx264", audio_codec="aac")
+            
+            # مكتمل 100%
+            progress_bar.progress(100)
+            percentage_text.markdown("### ✅ نسبة الإنجاز: `100%`")
+            status_box.empty()
+            
+            st.success("🎉 تم إنشاء الفيديو بنجاح!")
+            st.video(output_file)
+            
+        except Exception as e:
+            status_box.empty()
+            st.error(f"❌ حدث خطأ أثناء المعالجة: {e}")
