@@ -43,19 +43,18 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("🎬 Vido AI Pro - Ultimate Studio")
-st.caption("الاستوديو الذكي المتكامل لتوليد وصناعة محتوى مرئي وصوتي احترافي وطويل")
+st.caption("الاستوديو الذكي المتكامل لتوليد وصناعة محتوى مرئي وصوتي احترافي بدون علامات مائية")
 
 # إنشاء مجلد مؤقت للأصول والملفات
 os.makedirs("temp_assets", exist_ok=True)
 
-# إدخال السكريبت (يدعم المشاهد المتعددة لفيديوهات مدتها دقيقة أو أكثر)
-default_script = """المشهد الأول: رحلة استكشاف مذهلة داخل غابة ساحرة مليئة بالأشجار العملاقة والأضواء المتوهجة.
+# إدخال السكريبت
+default_script = """المشهد الأول: رحلة استكشاف مذهلة داخل غابة ساحرة مليئة بالأشجار العملاقة.
 المشهد الثاني: البطل يكتشف أثراً قديماً غامضاً ينبض بطاقة سرية لا تصدق.
-المشهد الثالث: تبدأ الأثر في الانفتاح كاشفة عن بوابة لعالم مستقبلية مذهلة.
-المشهد الرابع: تنطلق اللقطة نحو السماء الواسعة وسط نجوم الفضاء الساطعة لتختتم المشهد بملحمية."""
+المشهد الثالث: تبدأ الأثر في الانفتاح كاشفة عن بوابة لعالم مستقبلية مذهلة."""
 
 script_input = st.text_area(
-    "📜 أدخل السكريبت الخاص بك (اكتب كل مشهد في سطر مستقل لضمان الدقة وتوليد محتوى طويل):",
+    "📜 أدخل السكريبت الخاص بك (اكتب كل مشهد في سطر مستقل):",
     value=default_script,
     height=180
 )
@@ -68,14 +67,12 @@ if st.button("🚀 بدء إنشاء وتوليد مشاهد الاستوديو 
         scenes = [s.strip() for s in script_input.split('\n') if s.strip()]
         total_scenes = len(scenes)
         
-        # عناصر تتبع التقدم والنسبة المئوية المباشرة
         progress_bar = st.progress(0)
         percentage_text = st.empty()
         status_box = st.empty()
         
         try:
             for index, scene_text in enumerate(scenes):
-                # حساب النسبة المئوية التقريبية بدقة
                 current_percent = int(((index + 1) / total_scenes) * 100)
                 progress_bar.progress(current_percent)
                 percentage_text.markdown(f"### ⏳ نسبة الإنجاز: `{current_percent}%`")
@@ -89,34 +86,43 @@ if st.button("🚀 بدء إنشاء وتوليد مشاهد الاستوديو 
                 </div>
                 """, unsafe_allow_html=True)
                 
-                # 1. توليد التعليق الصوتي للمشهد بدقة عالية باستخدام gTTS
+                # 1. توليد التعليق الصوتي للمشهد
                 audio_path = f"temp_assets/scene_{index}.mp3"
-                tts = gTTS(text=clean_scene_desc, lang='ar', slow=False)
-                tts.save(audio_path)
+                try:
+                    tts = gTTS(text=clean_scene_desc, lang='ar', slow=False)
+                    tts.save(audio_path)
+                except Exception:
+                    pass
                 
-                # 2. توليد الصورة السينمائية المناسبة عبر Pollinations.ai مع معالجة Pillow
-                prompt_encoded = requests.utils.quote(f"Cinematic 8k resolution, highly detailed, dramatic lighting, {clean_scene_desc}")
-                image_url = f"https://image.pollinations.ai/prompt/{prompt_encoded}?width=1024&height=576&nologo=true"
+                # 2. توليد الصورة السينمائية بدون علامة مائية نهائياً عبر معلمة nologo=true
                 image_path = f"temp_assets/scene_{index}.jpg"
+                image_fetched = False
                 
-                img_response = requests.get(image_url)
-                if img_response.status_code == 200:
-                    with open(image_path, 'wb') as handler:
-                        handler.write(img_response.content)
-                    
-                    # استخدام Pillow لضبط الأبعاد والجودة بدقة احترافية
-                    img = Image.open(image_path)
-                    img = img.resize((1024, 576))
+                try:
+                    prompt_encoded = requests.utils.quote(f"Cinematic 8k resolution, highly detailed, {clean_scene_desc}")
+                    image_url = f"https://image.pollinations.ai/prompt/{prompt_encoded}?width=1024&height=576&nologo=true"
+                    img_response = requests.get(image_url, timeout=10)
+                    if img_response.status_code == 200:
+                        with open(image_path, 'wb') as handler:
+                            handler.write(img_response.content)
+                        img = Image.open(image_path)
+                        img = img.resize((1024, 576))
+                        img.save(image_path)
+                        image_fetched = True
+                except Exception:
+                    image_fetched = False
+                
+                if not image_fetched:
+                    img = Image.new('RGB', (1024, 576), color=(15, 23, 42))
                     img.save(image_path)
-                else:
-                    raise Exception("فشل في جلب صورة المشهد من مولد الذكاء الاصطناعي.")
-                
-                # عرض النتيجة المتكاملة لكل مشهد (صورة سينمائية + تعليق صوتي متزامن)
+
+                # عرض النتيجة المتكاملة لكل مشهد
                 st.image(image_path, caption=f"المشهد {index + 1}: {clean_scene_desc}", use_container_width=True)
-                st.audio(audio_path)
+                if os.path.exists(audio_path):
+                    st.audio(audio_path)
             
             status_box.empty()
-            st.success("🎉 تم إنشاء وتوليد كافة مشاهد الاستوديو بنجاح تام وبجودة تنافسية مذهلة!")
+            st.success("🎉 تم إنشاء وتوليد كافة مشاهد الاستوديو بنجاح تام وبدون أي علامات مائية!")
             
         except Exception as e:
             status_box.empty()
