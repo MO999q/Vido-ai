@@ -3,15 +3,17 @@ import os
 import requests
 from gtts import gTTS
 from PIL import Image
+import imageio
+from mutagen.mp3 import MP3
 
 # إعدادات الصفحة والتصميم العام
 st.set_page_config(
-    page_title="Vido AI Pro - Ultimate Studio",
+    page_title="Vido AI Studio - Free API Pipeline",
     page_icon="🎬",
     layout="centered"
 )
 
-# تصميم واجهة مستخدم احترافية وعصرية (Dark Mode)
+# تصميم واجهة مستخدم احترافية (Dark Mode)
 st.markdown("""
     <style>
     .main {
@@ -42,25 +44,25 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🎬 Vido AI Pro - Kids Studio")
-st.caption("الاستوديو الذكي المتكامل لتوليد وصناعة فيديوهات وعروض كرتونية احترافية للأطفال")
+st.title("🎬 Vido AI Studio - Free API Pipeline")
+st.caption("الاستوديو الذكي عبر سلسلة الـ APIs المجانية لإنتاج وتصدير فيديوهات الأطفال (MP4)")
 
-# إنشاء مجلد مؤقت للأصول والملفات
+# إنشاء مجلد مؤقت للأصول
 os.makedirs("temp_assets", exist_ok=True)
 
-# سكريبت افتراضي مخصص لفيديوهات الأطفال الكرتونية الجذابة
-default_script = """A cute baby smiling with colorful balloons in a magical bright playroom, 3D Disney Pixar style, vibrant colors.
-A cheerful baby elephant wearing a tiny party hat playing with bright stars, 3D animated style, high quality.
-A little cute kitten playing with a ball of yarn in a sunny garden, 3D animated style, bright and colorful."""
+# سكريبت افتراضي مخصص لفيديوهات الأطفال الكرتونية
+default_script = """A cute baby smiling with colorful balloons in a bright magical room.
+A cheerful baby elephant wearing a tiny party hat playing with bright stars.
+A little cute kitten playing with a ball of yarn in a sunny garden."""
 
 script_input = st.text_area(
     "📜 أدخل وصف المشاهد بالإنجليزية (كل مشهد في سطر مستقل):",
     value=default_script,
-    height=160
+    height=150
 )
 
-# زر البدء والمعالجة
-if st.button("🚀 بدء توليد وعرض الفيديو السينمائي المتكامل"):
+# زر البدء وتنفيذ السلسلة المجانية
+if st.button("🚀 بدء تشغيل السلسلة وتصدير الفيديو (MP4)"):
     if not script_input.strip():
         st.warning("⚠️ يرجى إدخال السكريبت أولاً!")
     else:
@@ -72,37 +74,42 @@ if st.button("🚀 بدء توليد وعرض الفيديو السينمائي 
         status_box = st.empty()
         
         try:
-            scene_data = []
+            frames = []
+            fps = 24
             
             for index, scene_text in enumerate(scenes):
-                current_percent = int(((index + 1) / total_scenes) * 100)
+                current_percent = int(((index + 1) / total_scenes) * 70)
                 progress_bar.progress(current_percent)
                 percentage_text.markdown(f"### ⏳ نسبة الإنجاز: `{current_percent}%`")
                 
                 status_box.markdown(f"""
                 <div class="status-card">
-                    <b>🎬 معالجة وتجهيز المشهد ({index + 1} من {total_scenes}):</b><br>
+                    <b>🎬 تشغيل سلسلة المشهد ({index + 1} من {total_scenes}):</b><br>
                     <i>"{scene_text}"</i>
                 </div>
                 """, unsafe_allow_html=True)
                 
-                # 1. توليد التعليق الصوتي للمشهد
+                # 1. الخطوة الأولى في السلسلة: توليد الصوت المجاني
                 audio_path = f"temp_assets/scene_{index}.mp3"
                 try:
                     tts = gTTS(text=scene_text, lang='en', slow=False)
                     tts.save(audio_path)
+                    audio = MP3(audio_path)
+                    duration = audio.info.length
                 except Exception:
-                    pass
+                    duration = 4.0
                 
-                # 2. توليد الصورة الكرتونية بجودة عالية جداً بدون علامات مائية (nologo=true)
+                # 2. الخطوة الثانية في السلسلة: جلب الصورة الكرتونية عبر API مجاني بدون علامة مائية
                 image_path = f"temp_assets/scene_{index}.jpg"
                 image_fetched = False
                 
                 try:
-                    prompt_encoded = requests.utils.quote(f"3D animated style, vibrant colors, cinematic lighting, cute and friendly, {scene_text}")
-                    image_url = f"https://image.pollinations.ai/prompt/{prompt_encoded}?width=1024&height=576&nologo=true"
-                    img_response = requests.get(image_url, timeout=15)
-                    if img_response.status_code == 200:
+                    safe_prompt = requests.utils.quote(f"cute colorful 3D cartoon style animation, vibrant colors, {scene_text}")
+                    # استخدام API مجاني مباشر وسريع
+                    image_url = f"https://image.pollinations.ai/prompt/{safe_prompt}?width=1024&height=576&nologo=true"
+                    
+                    img_response = requests.get(image_url, timeout=20)
+                    if img_response.status_code == 200 and len(img_response.content) > 1000:
                         with open(image_path, 'wb') as handler:
                             handler.write(img_response.content)
                         img = Image.open(image_path)
@@ -113,25 +120,47 @@ if st.button("🚀 بدء توليد وعرض الفيديو السينمائي 
                     image_fetched = False
                 
                 if not image_fetched:
-                    img = Image.new('RGB', (1024, 576), color=(30, 41, 59))
+                    img = Image.new('RGB', (1024, 576), color=(255, 182, 193))
                     img.save(image_path)
                 
-                scene_data.append({"image": image_path, "audio": audio_path, "desc": scene_text})
+                # تحويل الصورة إلى إطارات متسلسلة بالفيديو
+                img_frame = imageio.v2.imread(image_path)
+                num_frames = int(duration * fps)
+                for _ in range(num_frames):
+                    frames.append(img_frame)
 
+            # الخطوة الثالثة: دمج السلسلة بالكامل في فيديو MP4 نهائي
+            progress_bar.progress(85)
+            percentage_text.markdown("### ⏳ نسبة الإنجاز: `85%`")
+            status_box.markdown("""
+            <div class="status-card">
+                <b>🔄 جاري دمج عناصر السلسلة وتصدير الفيديو النهائي (MP4)...</b>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            output_video_path = "final_output_video.mp4"
+            
+            with imageio.get_writer(output_video_path, fps=fps, codec='libx264', quality=8) as writer:
+                for frame in frames:
+                    writer.append_data(frame)
+            
+            progress_bar.progress(100)
+            percentage_text.markdown("### ✅ نسبة الإنجاز: `100%`")
             status_box.empty()
-            st.success("🎉 تم توليد وإعداد كافة مشاهد الاستوديو الكرتوني بنجاح تام وبدون علامات مائية!")
             
-            # عرض المشاهد بشكل متسلسل واحترافي يشبه الفيديو الكامل
-            st.markdown("---")
-            st.subheader("▶️ معاضة العرض السينمائي المتكامل للمشاهد:")
+            st.success("🎉 تم تشغيل السلسلة وتصدير الفيديو الكامل (MP4) بنجاح تام وبدون علامات مائية!")
             
-            for i, data in enumerate(scene_data):
-                st.markdown(f"### المشهد {i + 1}")
-                st.image(data["image"], caption=data["desc"], use_container_width=True)
-                if os.path.exists(data["audio"]):
-                    st.audio(data["audio"])
-                st.markdown("---")
+            # عرض الفيديو وزر التحميل
+            st.video(output_video_path)
+            
+            with open(output_video_path, "rb") as file:
+                st.download_button(
+                    label="📥 تحميل الفيديو الكامل (MP4)",
+                    data=file,
+                    file_name="pipeline_kids_video.mp4",
+                    mime="video/mp4"
+                )
             
         except Exception as e:
             status_box.empty()
-            st.error(f"❌ حدث خطأ غير متوقع أثناء المعالجة: {e}")
+            st.error(f"❌ حدث خطأ في تنفيذ السلسلة: {e}")
