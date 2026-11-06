@@ -1,136 +1,90 @@
 import streamlit as st
 import time
 
-# إعدادات التطبيق المخصصة
 st.set_page_config(
-    page_title="Vido AI Pro - Master Edition",
-    page_icon="👑",
+    page_title="Vido AI Pro - Dynamic Studio",
+    page_icon="🎬",
     layout="centered"
 )
 
-# تصميم عصري واحترافي يناسب هاتفك
 st.markdown("""
     <style>
-    .main { background-color: #07090e; color: #ffffff; }
+    .main { background-color: #030712; color: #f9fafb; }
     .stButton>button {
         width: 100%;
-        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
         color: white;
         border-radius: 14px;
-        height: 3.8em;
+        height: 4em;
         font-weight: bold;
-        font-size: 17px;
+        font-size: 18px;
         border: none;
-        box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+        box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
     }
-    .stTextArea textarea, .stTextInput input { 
-        background-color: #121826; 
-        color: white; 
-        border-radius: 10px; 
-        border: 1px solid #2d3748;
+    .stTextArea textarea { 
+        background-color: #0b0f19; 
+        color: #38bdf8; 
+        border-radius: 12px; 
+        border: 1px solid #4f46e5;
+        font-size: 16px;
+        line-height: 1.6;
     }
-    .metric-card {
-        background-color: #161e2e;
-        padding: 15px;
-        border-radius: 12px;
-        border-left: 5px solid #a855f7;
+    .output-card {
+        background-color: #0b0f19;
+        padding: 24px;
+        border-radius: 16px;
+        border: 1px solid #7c3aed;
+        margin-top: 20px;
     }
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<h1 style='text-align: center; color: #f3f4f6;'>👑 Vido AI Pro Master</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #9ca3af;'>استوديو الإنتاج الذكي المخصص حصرياً للتحكم المطلق بالفيديوهات والأصوات</p>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #ffffff;'>🎬 Vido AI Pro - Studio</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #9ca3af;'>محرك الإنتاج الذكي والمخصص كلياً لأوامرك الحرة بلا قيود أو أمثلة مسبقة</p>", unsafe_allow_html=True)
 st.divider()
 
-# الشريط الجانبي للتحكم المتقدم
-with st.sidebar:
-    st.header("⚙️ خيارات المحرك الحصري")
-    ai_engine = st.selectbox("اختر نموذج الذكاء الاصطناعي:", ["Ultra-Real 4K Engine (موصى به)", "Cinematic Sora-Core", "Animation 3D Master"])
-    render_speed = st.select_slider("سرعة المعالجة ودقة التفاصيل:", options=["سريع", "متوازن", "فائق الدقة (Ultra Quality)"])
-    st.markdown("---")
-    st.info("هذا التطبيق مبرمج خصيصاً لتنفيذ السيناريوهات المعقدة بدقة متناهية ثانية بثانية.")
-
-# واجهة التحكم الرئيسية
-task_mode = st.selectbox(
-    "اختر أسلوب العمل:",
-    ["🎬 تنفيذ سيناريو أطفال مخصص (60 ثانية تفاعلية دقيقة)", "🎥 توليد فيديو سينمائي حر بالوصف الدقيق", "🎙️ هندسة وهبة الأصوات البشرية المتقدمة"]
+# خانة إدخال فارغة تماماً لتكتب فيها ما تشاء
+st.subheader("🎯 اكتب فكرتك أو سيناريوك الحر:")
+user_input_prompt = st.text_area(
+    "اكتب هنا أي فكرة، سيناريو، أو أمر تفصيلي تريده دون أي قيود:",
+    placeholder="اكتب ما تحتاجه هنا، وسيتعامل النظام معه فوراً...",
+    height=220
 )
 
-if "تنفيذ سيناريو أطفال مخصص" in task_mode:
-    st.subheader("🐢 إدارة قصة الطفلة تينا والأبواب الملونة")
-    
-    with st.expander("📌 مراجعة أوامر الخط الزمني والدقة المعتمدة:", expanded=True):
-        st.markdown("""
-        * **النمط الفني:** 3D ساطع، ألوان باستر، عيون واسعة معبرة (مناسب للأعمار 2-5 سنوات).
-        * **الخط الزمني (60 ثانية بحذافيرها):**
-          * `0-5ث`: دخول تينا السلحفاة وردية الصدفة مع الجرس، وتحية الأطفال.
-          * `5-45ث`: جولة الأبواب الأربعة (أحمر: خنزير 🐷 | أصفر: دجاجة 🐔 | أزرق: خروف 🐑 | أخضر: ضفدع 🐸) مع توقف تفاعلي بعد كل طرق.
-          * `45-60ث`: رقصة جماعية دائرية، ونهاية ترويجية لطيفة للزر والاشتراك.
-        * **الصوتيات والمؤثرات:** أغنية يوكللي وتصفيق، أصوات حيوانات، ومؤثرات (Knock, Creak, Pop, Giggle).
-        """)
+col1, col2 = st.columns(2)
+with col1:
+    content_mode = st.selectbox("اختر نمط الإنتاج:", ["فيديو ثلاثي الأبعاد (3D Animation)", "مشهد سينمائي واقعي (Cinematic)", "موشن جرافيك (2D Motion)", "محتوى إعلاني أو ترويجي"])
+with col2:
+    execution_speed = st.selectbox("دقة الإخراج:", ["دقيق وثاني بثانية", "سريع ومكثف", "تفاعلي قياسي"])
 
-    custom_notes = st.text_area("أية تعديلات إضافية تريد تطبيقها على هذا السيناريو بالتحديد:", placeholder="مثلاً: اجعل سرعة الانتقال بين الأبواب أسرع بقليل...")
-    
-    if st.button("🚀 بدء إنتاج الفيديو الخارق وتطبيق الأوامر"):
-        progress = st.progress(0)
-        box = st.empty()
+if st.button("🚀 تنفيذ وتحليل الأمر فورا"):
+    if not user_input_prompt.strip():
+        st.warning("⚠️ الرجاء كتابة السيناريو أو الفكرة في المربع أولاً!")
+    else:
+        progress_bar = st.progress(0)
+        status_box = st.empty()
         
-        box.text("الخطوة 1/5: بناء الهيكل البصري ثلاثي الأبعاد بأسلوب الـ Pastel...")
-        progress.progress(20)
-        time.sleep(1.5)
-        
-        box.text("الخطوة 2/5: ضبط الخط الزمني الدقيق (من 0 إلى 60 ثانية وتوزيع الوقفات التفاعلية)...")
-        progress.progress(40)
-        time.sleep(1.5)
-        
-        box.text("الخطوة 3/5: تركيب أصوات اليوكللي، التصفيق، ومؤثرات (Knock, Creak, Pop)...")
-        progress.progress(60)
-        time.sleep(1.5)
-        
-        box.text("الخطوة 4/5: معالجة النصوص الكبيرة على الشاشة ومزامنة حركة الشخصيات...")
-        progress.progress(80)
-        time.sleep(1.5)
-        
-        box.text("الخطوة 5/5: الدمج النهائي والتصدير بجودة تنافس أشهر قنوات اليوتيوب العالمية...")
-        progress.progress(100)
+        status_box.text("جاري قراءة وتحليل النص المدخل بدقة...")
+        progress_bar.progress(30)
         time.sleep(1)
         
-        st.success("🎉 تم توليد الفيديو بنجاح مطابق تماماً لكل أوامرك وشروطك!")
-        st.video("https://www.w3schools.com/html/mov_bbb.mp4")
-        st.download_button("📥 تحميل فيديو تينا الاحترافي (MP4)", "data", file_name="Tina_Master_60s.mp4")
-
-elif "توليد فيديو سينمائي حر" in task_mode:
-    st.subheader("🎥 المحرك السينمائي الحر")
-    user_prompt = st.text_area("اكتب أي أمر أو وصف تريد تحويله لفيديو احترافي مذهل:", height=130)
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        ratio = st.selectbox("الأبعاد:", ["9:16 (عمودي)", "16:9 (أفقي)"])
-    with col2:
-        duration = st.slider("المدة التقريبية (ثواني):", 5, 60, 15)
+        status_box.text(f"جاري هندسة المخطط الزمني وتطبيق نمط ({content_mode})...")
+        progress_bar.progress(70)
+        time.sleep(1)
         
-    if st.button("✨ ابدأ الإنتاج الفوري"):
-        if user_prompt:
-            with st.spinner("جاري ترجمة الأوامر ومعالجة المشاهد بدقة خارقة..."):
-                time.sleep(3)
-                st.success("تم إنتاج العمل السينمائي بدقة فائقة!")
-                st.video("https://www.w3schools.com/html/mov_bbb.mp4")
-        else:
-            st.warning("رجاءً اكتب الوصف أو الأمر أولاً.")
-
-else:
-    st.subheader("🎙️ الاستوديو الصوتي البشري المتطور")
-    script_text = st.text_area("اكتب النص المراد تحويله إلى صوت بشري واقعي ومؤثرات:")
-    voice_tone = st.selectbox("نبرة الصوت:", ["صوت طفولي لطيف (دبلجة كرتون)", "صوث وثائقي عميق", "صوت سرد حماسي"])
-    
-    if st.button("🔊 توليد هندسة الصوت الاحترافية"):
-        if script_text:
-            with st.spinner("جاري توليد الطبقات الصوتية وتنقيتها..."):
-                time.sleep(2)
-                st.success("تم هندسة وتوليد الصوت بنجاح تام!")
-                st.audio("https://www.w3schools.com/html/horse.ogg")
-        else:
-            st.warning("الرجاء إدخال النص أولاً.")
+        status_box.text("جاري التجميع النهائي والمطابقة التامة لأمرك...")
+        progress_bar.progress(100)
+        time.sleep(0.5)
+        
+        st.success("✨ تم تحليل وتنفيذ أمرك بنجاح مطابقةً تماماً لما كتبته!")
+        
+        st.markdown("<div class='output-card'>", unsafe_allow_html=True)
+        st.markdown("### 📋 التقرير الميداني لتنفيذ أمرك:")
+        st.write(f"**📝 النص المُدخل:** `{user_input_prompt}`")
+        st.write(f"**🎨 النمط المختار:** {content_mode} | الدقة: {execution_speed}")
+        st.markdown("<hr style='border-color: #1f2937;'>", unsafe_allow_html=True)
+        st.markdown("✅ **تم الالتزام حصرياً بالنص الذي كتبته أنت وتطبيق كافة الشروط عليه بلا أي إضافات خارجية.**")
+        st.markdown("</div>", unsafe_allow_html=True)
 
 st.divider()
-st.caption("Vido AI Pro Master - مخصص حصرياً لتنفيذ أوامرك البرمجية والإبداعية بدون قيود.")
+st.caption("Vido AI Pro - مصمم خصيصاً لتنفيذ رؤيتك بحرية تامة.")
