@@ -1,0 +1,9 @@
+streamlit
+requests
+gTTS
+moviepy
+google-generativeai
+Pillow
+mutagen
+pysrt
+ 
